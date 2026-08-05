@@ -14,16 +14,16 @@ namespace Academia.Controllers
             _context = context;
         }
 
-        // Listar Alunos
+        
         public async Task<IActionResult> Index()
         {
             return View(await _context.Alunos.ToListAsync());
         }
 
-        // GET: Create
+        
         public IActionResult Create() => View();
 
-        // POST: Create
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Aluno aluno)
