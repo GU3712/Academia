@@ -10,14 +10,18 @@ CREATE TABLE Aluno (
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) NOT NULL UNIQUE,
     data_nascimento DATE NOT NULL,
-    telefone VARCHAR(20)
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    status VARCHAR(20) NOT NULL DEFAULT 'Ativo'
 );
 
 
 CREATE TABLE Plano (
     id_plano INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
-    valor DECIMAL(10,2) NOT NULL
+    descricao VARCHAR(255),
+    valor DECIMAL(10,2) NOT NULL,
+    duracao_dias INT NOT NULL
 );
 
 
@@ -27,25 +31,39 @@ CREATE TABLE Matricula (
     id_plano INT NOT NULL,
     data_inicio DATE NOT NULL,
     data_fim DATE NOT NULL,
-    status VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Ativa',
     FOREIGN KEY (id_aluno) REFERENCES Aluno(id_aluno),
     FOREIGN KEY (id_plano) REFERENCES Plano(id_plano)
+);
+
+
+CREATE TABLE Pagamento (
+    id_pagamento INT IDENTITY(1,1) PRIMARY KEY,
+    id_matricula INT NOT NULL,
+    valor_pago DECIMAL(10,2) NOT NULL,
+    data_pagamento DATETIME NOT NULL DEFAULT GETDATE(),
+    forma_pagamento VARCHAR(30) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Concluido',
+    FOREIGN KEY (id_matricula) REFERENCES Matricula(id_matricula)
 );
 
 
 CREATE TABLE Instrutor (
     id_instrutor INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    cref VARCHAR(20) NOT NULL
+    cref VARCHAR(20) NOT NULL UNIQUE,
+    telefone VARCHAR(20),
+    especialidade VARCHAR(50)
 );
 
 
-CREATE TABLE Ficha_Treino (
+CREATE TABLE Treino (
     id_treino INT IDENTITY(1,1) PRIMARY KEY,
     id_aluno INT NOT NULL,
     id_instrutor INT NOT NULL,
-    data_criacao DATE NOT NULL,
     objetivo VARCHAR(100),
+    data_criacao DATE NOT NULL DEFAULT GETDATE(),
+    validade DATE,
     FOREIGN KEY (id_aluno) REFERENCES Aluno(id_aluno),
     FOREIGN KEY (id_instrutor) REFERENCES Instrutor(id_instrutor)
 );
@@ -58,13 +76,28 @@ CREATE TABLE Exercicio (
 );
 
 
-CREATE TABLE Ficha_Exercicio (
+CREATE TABLE Item_Treino (
+    id_item_treino INT IDENTITY(1,1) PRIMARY KEY,
     id_treino INT NOT NULL,
     id_exercicio INT NOT NULL,
+    divisao CHAR(1) NOT NULL,
     series INT NOT NULL,
     repeticoes INT NOT NULL,
     carga_kg DECIMAL(5,2),
-    PRIMARY KEY (id_treino, id_exercicio),
-    FOREIGN KEY (id_treino) REFERENCES Ficha_Treino(id_treino) ON DELETE CASCADE,
+    descanso_seg INT,
+    FOREIGN KEY (id_treino) REFERENCES Treino(id_treino) ON DELETE CASCADE,
     FOREIGN KEY (id_exercicio) REFERENCES Exercicio(id_exercicio)
+);
+
+
+CREATE TABLE Avaliacao_Fisica (
+    id_avaliacao INT IDENTITY(1,1) PRIMARY KEY,
+    id_aluno INT NOT NULL,
+    id_instrutor INT NOT NULL,
+    data_avaliacao DATE NOT NULL DEFAULT GETDATE(),
+    peso DECIMAL(5,2) NOT NULL,
+    altura DECIMAL(3,2) NOT NULL,
+    percentual_gordura DECIMAL(4,2),
+    FOREIGN KEY (id_aluno) REFERENCES Aluno(id_aluno),
+    FOREIGN KEY (id_instrutor) REFERENCES Instrutor(id_instrutor)
 );
